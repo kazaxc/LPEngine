@@ -1,6 +1,8 @@
 # CMakeList.txt : CMake file for LPEngineCore
 
 cmake_minimum_required (VERSION 3.8)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Link external libraries
 
 # Vulkan SDK

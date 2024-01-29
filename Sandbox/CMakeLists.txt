@@ -1,6 +1,9 @@
 # CMakeList.txt : CMake file for Sandbox
 
 cmake_minimum_required (VERSION 3.8)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Set the project name and version
 project(Sandbox VERSION 0.0.1)
 
