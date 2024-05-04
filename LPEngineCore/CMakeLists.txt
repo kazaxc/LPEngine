@@ -35,6 +35,12 @@ set(SOURCE_FILES
 	"include/util/DateTime.h" 
 	"include/rendering/Window.h"
 	"src/rendering/Window.cpp"
+	"include/rendering/Pipeline.h"
+	"src/rendering/Pipeline.cpp"
+	"include/rendering/Device.h"
+	"src/rendering/Device.cpp"
+	"include/rendering/Swapchain.h"
+	"src/rendering/Swapchain.cpp"
 )
 
 # Add source files to the shared library

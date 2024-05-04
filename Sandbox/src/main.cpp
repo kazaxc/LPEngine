@@ -1,16 +1,26 @@
 #include <iostream>
 #include <string>
-#include "LPEngine.h"
+#include <memory>
+#include <vector>
+
+#include "TestingApp.h"
 
 int main(int argc, char** argv)
 {
+	// Must initialize logger before anything else
 	LPEngine::Logger::Init();
-	LPEngine::Logger::Log(LPEngine::LogLevel::INFO, "Starting Engine!");
 
-	LPEngine::Logger::Log(LPEngine::LogLevel::INFO, "Creating Window!");
+	TestingApp app;
 
-	LPEngine::Window window("Sandbox", 800, 600);
+	try
+	{
+		app.Run();
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		return EXIT_FAILURE;
+	}
 
-	LPEngine::Logger::Log(LPEngine::LogLevel::INFO, "Terminating Engine!");
 	return 0;
 }

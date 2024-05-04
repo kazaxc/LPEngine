@@ -9,7 +9,9 @@ project(Sandbox VERSION 0.0.1)
 
 # Set the source files
 set(SOURCE_FILES
-	src/main.cpp
+    "src/TestingApp.h"
+    "src/TestingApp.cpp"
+	"src/main.cpp"
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
