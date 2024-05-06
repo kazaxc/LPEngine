@@ -41,6 +41,14 @@ set(SOURCE_FILES
 	"src/rendering/Device.cpp"
 	"include/rendering/Swapchain.h"
 	"src/rendering/Swapchain.cpp"
+	"include/rendering/Model.h"
+	"src/rendering/Model.cpp"
+	"include/core/GameObject.h"
+	"src/core/GameObject.cpp"
+	"include/rendering/Renderer.h"
+	"src/rendering/Renderer.cpp"
+	"include/rendering/RenderSystem.h"
+	"src/rendering/RenderSystem.cpp"
 )
 
 # Add source files to the shared library

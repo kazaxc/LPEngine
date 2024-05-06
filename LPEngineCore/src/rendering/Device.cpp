@@ -13,6 +13,7 @@ namespace LPEngine
 	// local callback functions
 	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 	{
+		Logger::Log(LogLevel::ERROR, "validation layer: ", pCallbackData->pMessage);
 		std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
 
 		return VK_FALSE;
@@ -70,6 +71,7 @@ namespace LPEngine
 	{
 		if (enableValidationLayers && !checkValidationLayerSupport())
 		{
+			Logger::Log(LogLevel::ERROR, "validation layers requested, but not available!");
 			throw std::runtime_error("validation layers requested, but not available!");
 		}
 
@@ -106,6 +108,7 @@ namespace LPEngine
 
 		if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
 		{
+			Logger::Log(LogLevel::ERROR, "failed to create instance!");
 			throw std::runtime_error("failed to create instance!");
 		}
 
@@ -118,6 +121,7 @@ namespace LPEngine
 		vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 		if (deviceCount == 0)
 		{
+			Logger::Log(LogLevel::ERROR, "failed to find GPUs with Vulkan support!");
 			throw std::runtime_error("failed to find GPUs with Vulkan support!");
 		}
 		Logger::Log(LogLevel::INFO, "found ", deviceCount, " devices with Vulkan support");
@@ -135,6 +139,7 @@ namespace LPEngine
 
 		if (physicalDevice == VK_NULL_HANDLE)
 		{
+			Logger::Log(LogLevel::ERROR, "failed to find a suitable GPU!");
 			throw std::runtime_error("failed to find a suitable GPU!");
 		}
 
@@ -187,6 +192,7 @@ namespace LPEngine
 
 		if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device_) != VK_SUCCESS)
 		{
+			Logger::Log(LogLevel::ERROR, "failed to create logical device!");
 			throw std::runtime_error("failed to create logical device!");
 		}
 
@@ -205,6 +211,7 @@ namespace LPEngine
 
 		if (vkCreateCommandPool(device_, &poolInfo, nullptr, &commandPool) != VK_SUCCESS)
 		{
+			Logger::Log(LogLevel::ERROR, "failed to create command pool!");
 			throw std::runtime_error("failed to create command pool!");
 		}
 	}
@@ -250,6 +257,7 @@ namespace LPEngine
 		populateDebugMessengerCreateInfo(createInfo);
 		if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS)
 		{
+			Logger::Log(LogLevel::ERROR, "failed to set up debug messenger!");
 			throw std::runtime_error("failed to set up debug messenger!");
 		}
 	}
@@ -426,6 +434,7 @@ namespace LPEngine
 				return format;
 			}
 		}
+		Logger::Log(LogLevel::ERROR, "failed to find supported format!");
 		throw std::runtime_error("failed to find supported format!");
 	}
 
@@ -441,6 +450,7 @@ namespace LPEngine
 			}
 		}
 
+		Logger::Log(LogLevel::ERROR, "failed to find suitable memory type!");
 		throw std::runtime_error("failed to find suitable memory type!");
 	}
 
@@ -454,6 +464,7 @@ namespace LPEngine
 
 		if (vkCreateBuffer(device_, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
 		{
+			Logger::Log(LogLevel::ERROR, "failed to create vertex buffer!");
 			throw std::runtime_error("failed to create vertex buffer!");
 		}
 
@@ -467,6 +478,7 @@ namespace LPEngine
 
 		if (vkAllocateMemory(device_, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
 		{
+			Logger::Log(LogLevel::ERROR, "failed to allocate vertex buffer memory!");
 			throw std::runtime_error("failed to allocate vertex buffer memory!");
 		}
 
@@ -545,6 +557,7 @@ namespace LPEngine
 	{
 		if (vkCreateImage(device_, &imageInfo, nullptr, &image) != VK_SUCCESS)
 		{
+			Logger::Log(LogLevel::ERROR, "failed to create image!");
 			throw std::runtime_error("failed to create image!");
 		}
 
@@ -558,11 +571,13 @@ namespace LPEngine
 
 		if (vkAllocateMemory(device_, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS)
 		{
+			Logger::Log(LogLevel::ERROR, "failed to allocate image memory!");
 			throw std::runtime_error("failed to allocate image memory!");
 		}
 
 		if (vkBindImageMemory(device_, image, imageMemory, 0) != VK_SUCCESS)
 		{
+			Logger::Log(LogLevel::ERROR, "failed to bind image memory!");
 			throw std::runtime_error("failed to bind image memory!");
 		}
 	}

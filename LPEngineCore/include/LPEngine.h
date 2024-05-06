@@ -6,3 +6,7 @@
 #include "rendering/Pipeline.h"
 #include "rendering/Device.h"
 #include "rendering/Swapchain.h"
+#include "rendering/Model.h"
+#include "core/GameObject.h"
+#include "rendering/Renderer.h"
+#include "rendering/RenderSystem.h"

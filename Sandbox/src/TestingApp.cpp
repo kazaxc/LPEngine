@@ -1,144 +1,123 @@
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 #include <stdexcept>
 #include <array>
+#include <vector>
+#include <memory>
 
 #include "TestingApp.h"
 
 TestingApp::TestingApp()
 {
-	CreatePipelineLayout();
-	CreatePipeline();
-	CreateCommandBuffers();
+	LoadGameObjects();
 }
 
 TestingApp::~TestingApp()
 {
-	vkDestroyPipelineLayout(m_Device.device(), m_PipelineLayout, nullptr);
-}
 
+}
 
 void TestingApp::Run()
 {
+	LPEngine::RenderSystem renderSystem(m_Device, m_Renderer.GetSwapChainRenderPass());
+
 	while (!m_Window.IsClosed())
 	{
 		SDL_Event event;
 		SDL_PollEvent(&event);
+
+		if (event.type == SDL_WINDOWEVENT_RESIZED)
+		{
+			m_Window.SetWindowResized();
+			m_Window.SetWidth(event.window.data1);
+			m_Window.SetHeight(event.window.data2);
+		}
 
 		if (event.type == SDL_QUIT)
 		{
 			m_Window.Close();
 		}
 
-		DrawFrame();
+		if (auto commandBuffer = m_Renderer.BeginFrame())
+		{
+			m_Renderer.BeginSwapChainRenderPass(commandBuffer);
+			renderSystem.RenderGameObjects(commandBuffer, m_GameObjects);
+			m_Renderer.EndSwapChainRenderPass(commandBuffer);
+			m_Renderer.EndFrame();
+		}
 	}
 
 	vkDeviceWaitIdle(m_Device.device());
 }
 
-void TestingApp::CreatePipelineLayout()
+std::unique_ptr<LPEngine::Model> createCubeModel(LPEngine::Device& device, glm::vec3 offset)
 {
-	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = 0;
-	pipelineLayoutInfo.pSetLayouts = nullptr;
-	pipelineLayoutInfo.pushConstantRangeCount = 0;
-	pipelineLayoutInfo.pPushConstantRanges = nullptr;
+	std::vector<LPEngine::Model::Vertex> vertices{
 
-	if (vkCreatePipelineLayout(m_Device.device(), &pipelineLayoutInfo, nullptr, &m_PipelineLayout) != VK_SUCCESS)
-	{
-		LPEngine::Logger::Log(LPEngine::LogLevel::ERROR, "Failed to create pipeline layout!");
-		throw std::runtime_error("Failed to create pipeline layout!");
+		// left face (white)
+		{{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+		{{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+		{{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
+		{{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+		{{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
+		{{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+
+		// right face (yellow)
+		{{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+		{{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+		{{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
+		{{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+		{{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
+		{{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+
+		// top face (orange, remember y axis points down)
+		{{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+		{{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+		{{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+		{{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+		{{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+		{{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+
+		// bottom face (red)
+		{{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+		{{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+		{{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
+		{{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+		{{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+		{{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+
+		// nose face (blue)
+		{{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+		{{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+		{{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+		{{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+		{{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+		{{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+
+		// tail face (green)
+		{{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+		{{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+		{{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+		{{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+		{{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+		{{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+
+	};
+	for (auto& v : vertices) {
+		v.position += offset;
 	}
+	return std::make_unique<LPEngine::Model>(device, vertices);
 }
 
-void TestingApp::CreatePipeline()
+void TestingApp::LoadGameObjects()
 {
-	auto pipelineConfig = LPEngine::Pipeline::defaultPipelineConfigInfo(m_SwapChain.width(), m_SwapChain.height());
-	pipelineConfig.renderPass = m_SwapChain.getRenderPass();
-	pipelineConfig.pipelineLayout = m_PipelineLayout;
-	m_Pipeline = std::make_unique<LPEngine::Pipeline>(m_Device, "shaders/basic.vert.spv", "shaders/basic.frag.spv", pipelineConfig);
-}
+	std::shared_ptr<LPEngine::Model> cubeModel = createCubeModel(m_Device, { 0.f, 0.f, 0.f });
 
-void TestingApp::CreateCommandBuffers()
-{
-	m_CommandBuffers.resize(m_SwapChain.imageCount());
-
-	VkCommandBufferAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.commandPool = m_Device.getCommandPool();
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = static_cast<uint32_t>(m_CommandBuffers.size());
-
-	if (vkAllocateCommandBuffers(m_Device.device(), &allocInfo, m_CommandBuffers.data()) != VK_SUCCESS)
-	{
-		LPEngine::Logger::Log(LPEngine::LogLevel::ERROR, "Failed to allocate command buffers!");
-		throw std::runtime_error("Failed to allocate command buffers!");
-	}
-
-	for (int i = 0; i < m_CommandBuffers.size(); i++)
-	{
-		VkCommandBufferBeginInfo beginInfo{};
-		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-		if (vkBeginCommandBuffer(m_CommandBuffers[i], &beginInfo) != VK_SUCCESS)
-		{
-			LPEngine::Logger::Log(LPEngine::LogLevel::ERROR, "Failed to begin recording command buffer!");
-			throw std::runtime_error("Failed to begin recording command buffer!");
-		}
-
-		VkRenderPassBeginInfo renderPassInfo{};
-		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = m_SwapChain.getRenderPass();
-		renderPassInfo.framebuffer = m_SwapChain.getFrameBuffer(i);
-		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = m_SwapChain.getSwapChainExtent();
-
-		std::array<VkClearValue, 2> clearValues{};
-		clearValues[0].color = { 0.1f, 0.1f, 0.1f, 1.0f };
-		clearValues[1].depthStencil = { 1.0f, 0 };
-
-		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-		renderPassInfo.pClearValues = clearValues.data();
-
-		vkCmdBeginRenderPass(m_CommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-		m_Pipeline->Bind(m_CommandBuffers[i]);
-		vkCmdDraw(m_CommandBuffers[i], 3, 1, 0, 0);
-
-		vkCmdEndRenderPass(m_CommandBuffers[i]);
-		if (vkEndCommandBuffer(m_CommandBuffers[i]) != VK_SUCCESS)
-		{
-			LPEngine::Logger::Log(LPEngine::LogLevel::ERROR, "Failed to record command buffer!");
-			throw std::runtime_error("Failed to record command buffer!");
-		}
-	}
-}
-
-void TestingApp::DrawFrame()
-{
-	uint32_t imageIndex;
-	auto result = m_SwapChain.acquireNextImage(&imageIndex);
-
-	if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
-	{
-		LPEngine::Logger::Log(LPEngine::LogLevel::ERROR, "Failed to acquire next image!");
-		throw std::runtime_error("Failed to acquire next image!");
-	}
-
-	result = m_SwapChain.submitCommandBuffers(&m_CommandBuffers[imageIndex], &imageIndex);
-
-	if (result != VK_SUCCESS)
-	{
-		LPEngine::Logger::Log(LPEngine::LogLevel::ERROR, "Failed to submit command buffers!");
-		throw std::runtime_error("Failed to submit command buffers!");
-	}
-
-	/*
-	result = m_SwapChain.presentImage(imageIndex);
-
-	if (result != VK_SUCCESS)
-	{
-		LPEngine::Logger::Log(LPEngine::LogLevel::ERROR, "Failed to present image!");
-		throw std::runtime_error("Failed to present image!");
-	}
-	*/
+	auto cubeObject = LPEngine::GameObject::CreateGameObject();
+	cubeObject.model = cubeModel;
+	cubeObject.transform.translation = { 0.f, 0.f, .5f };
+	cubeObject.transform.scale = { .5f, .5f, .5f };
+	m_GameObjects.push_back(std::move(cubeObject));
 }

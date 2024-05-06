@@ -44,7 +44,7 @@ namespace LPEngine
 			return false;
 		}
 
-		m_Window = SDL_CreateWindow(m_Title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_Width, m_Height, SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN);
+		m_Window = SDL_CreateWindow(m_Title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_Width, m_Height, SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 		if (m_Window == nullptr)
 		{
 			Logger::Log(LogLevel::ERROR, "Failed to create window: ", SDL_GetError());

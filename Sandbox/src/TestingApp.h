@@ -21,15 +21,10 @@ public:
 	void Run();
 
 private:
-	void CreatePipelineLayout();
-	void CreatePipeline();
-	void CreateCommandBuffers();
-	void DrawFrame();
+	void LoadGameObjects();
 
 	LPEngine::Window m_Window{ "LPEngine", WIDTH, HEIGHT };
 	LPEngine::Device m_Device{ m_Window };
-	LPEngine::SwapChain m_SwapChain{ m_Device, m_Window.GetExtent() };
-	std::unique_ptr<LPEngine::Pipeline> m_Pipeline;
-	VkPipelineLayout m_PipelineLayout;
-	std::vector<VkCommandBuffer> m_CommandBuffers;
+	LPEngine::Renderer m_Renderer{ m_Window, m_Device };
+	std::vector<LPEngine::GameObject> m_GameObjects;
 };

@@ -3,6 +3,7 @@
 #include <vulkan/vulkan.h>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "Device.h"
 #include "../core/Defines.h"
@@ -14,10 +15,11 @@ namespace LPEngine {
 		static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 		SwapChain(Device& deviceRef, VkExtent2D windowExtent);
+		SwapChain(Device& deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previous);
 		~SwapChain();
 
 		SwapChain(const SwapChain&) = delete;
-		void operator=(const SwapChain&) = delete;
+		SwapChain& operator=(const SwapChain&) = delete;
 
 		VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
 		VkRenderPass getRenderPass() { return renderPass; }
@@ -37,7 +39,13 @@ namespace LPEngine {
 		VkResult acquireNextImage(uint32_t* imageIndex);
 		VkResult submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);
 
+		bool compareSwapFormats(const SwapChain& swapChain) const
+		{
+			return swapChain.swapChainDepthFormat == swapChainDepthFormat && swapChain.swapChainImageFormat == swapChainImageFormat;
+		}
+
 	private:
+		void init();
 		void createSwapChain();
 		void createImageViews();
 		void createDepthResources();
@@ -51,6 +59,7 @@ namespace LPEngine {
 		VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
 		VkFormat swapChainImageFormat;
+		VkFormat swapChainDepthFormat;
 		VkExtent2D swapChainExtent;
 
 		std::vector<VkFramebuffer> swapChainFramebuffers;
@@ -66,6 +75,7 @@ namespace LPEngine {
 		VkExtent2D windowExtent;
 
 		VkSwapchainKHR swapChain;
+		std::shared_ptr<SwapChain> oldSwapChain;
 
 		std::vector<VkSemaphore> imageAvailableSemaphores;
 		std::vector<VkSemaphore> renderFinishedSemaphores;
