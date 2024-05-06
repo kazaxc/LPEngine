@@ -8,6 +8,7 @@
 #include "Device.h"
 #include "../core/GameObject.h"
 #include "Pipeline.h"
+#include "Camera.h"
 
 namespace LPEngine
 {
@@ -20,7 +21,7 @@ namespace LPEngine
 		RenderSystem(const RenderSystem&) = delete;
 		RenderSystem& operator=(const RenderSystem&) = delete;
 
-		void RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects);
+		void RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera);
 
 	private:
 		void CreatePipelineLayout();

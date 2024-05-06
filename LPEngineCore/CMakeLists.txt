@@ -49,6 +49,8 @@ set(SOURCE_FILES
 	"src/rendering/Renderer.cpp"
 	"include/rendering/RenderSystem.h"
 	"src/rendering/RenderSystem.cpp"
+	"include/rendering/Camera.h"
+	"src/rendering/Camera.cpp"
 )
 
 # Add source files to the shared library

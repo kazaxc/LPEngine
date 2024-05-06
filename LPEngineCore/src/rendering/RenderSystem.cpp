@@ -61,9 +61,11 @@ namespace LPEngine
 		m_Pipeline = std::make_unique<LPEngine::Pipeline>(m_Device, "shaders/basic.vert.spv", "shaders/basic.frag.spv", pipelineConfig);
 	}
 
-	void RenderSystem::RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects)
+	void RenderSystem::RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera)
 	{
 		m_Pipeline->Bind(commandBuffer);
+
+		auto projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
 
 		for (auto& obj : gameObjects)
 		{
@@ -72,7 +74,7 @@ namespace LPEngine
 
 			SimplePushConstantData push{};
 			push.color = obj.color;
-			push.transform = obj.transform.Mat4();
+			push.transform = projectionView * obj.transform.Mat4();
 
 			vkCmdPushConstants(commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 			obj.model->Bind(commandBuffer);

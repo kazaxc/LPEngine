@@ -10,3 +10,4 @@
 #include "core/GameObject.h"
 #include "rendering/Renderer.h"
 #include "rendering/RenderSystem.h"
+#include "rendering/Camera.h"

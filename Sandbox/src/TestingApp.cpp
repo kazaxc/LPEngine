@@ -22,6 +22,9 @@ TestingApp::~TestingApp()
 void TestingApp::Run()
 {
 	LPEngine::RenderSystem renderSystem(m_Device, m_Renderer.GetSwapChainRenderPass());
+	LPEngine::Camera camera{};
+	//camera.SetViewDirection(glm::vec3(0.f), glm::vec3(.5f, 0.f, 1.f));
+	camera.SetViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
 
 	while (!m_Window.IsClosed())
 	{
@@ -40,10 +43,17 @@ void TestingApp::Run()
 			m_Window.Close();
 		}
 
+		float aspect = m_Renderer.GetAspectRatio();
+		// Option to use orthographic projection
+		//camera.SetOrthographicMode(-aspect, aspect, -1, 1, -1, 1);
+
+		// Option to use perspective projection
+		camera.SetPerspectiveMode(glm::radians(50.f), aspect, 0.1f, 100.f);
+
 		if (auto commandBuffer = m_Renderer.BeginFrame())
 		{
 			m_Renderer.BeginSwapChainRenderPass(commandBuffer);
-			renderSystem.RenderGameObjects(commandBuffer, m_GameObjects);
+			renderSystem.RenderGameObjects(commandBuffer, m_GameObjects, camera);
 			m_Renderer.EndSwapChainRenderPass(commandBuffer);
 			m_Renderer.EndFrame();
 		}
@@ -117,7 +127,7 @@ void TestingApp::LoadGameObjects()
 
 	auto cubeObject = LPEngine::GameObject::CreateGameObject();
 	cubeObject.model = cubeModel;
-	cubeObject.transform.translation = { 0.f, 0.f, .5f };
+	cubeObject.transform.translation = { 0.f, 0.f, 2.5f };
 	cubeObject.transform.scale = { .5f, .5f, .5f };
 	m_GameObjects.push_back(std::move(cubeObject));
 }

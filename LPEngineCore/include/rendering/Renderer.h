@@ -22,6 +22,7 @@ namespace LPEngine
 		void operator=(const Renderer&) = delete;
 
 		VkRenderPass GetSwapChainRenderPass() const { return m_SwapChain->getRenderPass(); }
+		float GetAspectRatio() const { return m_SwapChain->extentAspectRatio(); }
 		bool IsFrameInProgress() const { return m_FrameStarted; }
 
 		VkCommandBuffer GetCurrentCommandBuffer() const
