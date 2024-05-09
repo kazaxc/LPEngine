@@ -8,7 +8,7 @@
 
 namespace LPEngine
 {
-	struct TransformComponent
+	struct GOTransformComponent
 	{
 		glm::vec3 translation{};
 		glm::vec3 scale{ 1.f, 1.f, 1.f };
@@ -70,7 +70,7 @@ namespace LPEngine
 
 		std::shared_ptr<Model> model;
 		glm::vec3 color{};
-		TransformComponent transform{};
+		GOTransformComponent transform{};
 
 	private:
 		GameObject(id_t id) : m_id(id) {}

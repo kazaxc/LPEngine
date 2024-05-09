@@ -11,3 +11,4 @@
 #include "rendering/Renderer.h"
 #include "rendering/RenderSystem.h"
 #include "rendering/Camera.h"
+#include "core/ECS.h"

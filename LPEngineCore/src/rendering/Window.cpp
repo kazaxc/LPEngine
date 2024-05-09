@@ -21,6 +21,8 @@ namespace LPEngine
 			m_IsClosed = false;
 		}
 	}
+	
+	
 
 	Window::~Window()
 	{

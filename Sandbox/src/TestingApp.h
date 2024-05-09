@@ -22,9 +22,11 @@ public:
 
 private:
 	void LoadGameObjects();
+	void LoadEntites();
 
 	LPEngine::Window m_Window{ "LPEngine", WIDTH, HEIGHT };
 	LPEngine::Device m_Device{ m_Window };
 	LPEngine::Renderer m_Renderer{ m_Window, m_Device };
 	std::vector<LPEngine::GameObject> m_GameObjects;
+	LPEngine::ECSManager m_EntityManager;
 };

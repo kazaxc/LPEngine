@@ -69,9 +69,6 @@ namespace LPEngine
 
 		for (auto& obj : gameObjects)
 		{
-			obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
-			obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.005f, glm::two_pi<float>());
-
 			SimplePushConstantData push{};
 			push.color = obj.color;
 			push.transform = projectionView * obj.transform.Mat4();
@@ -79,6 +76,24 @@ namespace LPEngine
 			vkCmdPushConstants(commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 			obj.model->Bind(commandBuffer);
 			obj.model->Draw(commandBuffer);
+		}
+	}
+
+	void RenderSystem::RenderEntities(VkCommandBuffer commandBuffer, ECSManager& entityManager, const Camera& camera)
+	{
+		m_Pipeline->Bind(commandBuffer);
+
+		auto projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
+
+		for (auto& entity : entityManager.GetEntities())
+		{
+			SimplePushConstantData push{};
+			push.color = entity.GetComponent<ColourComponent>()->colour;
+			push.transform = projectionView * entity.GetComponent<TransformComponent>()->Mat4();
+
+			vkCmdPushConstants(commandBuffer, m_PipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
+			entity.GetComponent<ModelComponent>()->model->Bind(commandBuffer);
+			entity.GetComponent<ModelComponent>()->model->Draw(commandBuffer);
 		}
 	}
 }

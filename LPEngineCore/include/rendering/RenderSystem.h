@@ -7,6 +7,7 @@
 #include "../core/Logger.h"
 #include "Device.h"
 #include "../core/GameObject.h"
+#include "../core/ECS.h"
 #include "Pipeline.h"
 #include "Camera.h"
 
@@ -22,6 +23,7 @@ namespace LPEngine
 		RenderSystem& operator=(const RenderSystem&) = delete;
 
 		void RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera);
+		void RenderEntities(VkCommandBuffer commandBuffer, ECSManager& entityManager, const Camera& camera);
 
 	private:
 		void CreatePipelineLayout();

@@ -401,14 +401,14 @@ namespace LPEngine {
 
 	VkPresentModeKHR SwapChain::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)
 	{
-		//for (const auto& availablePresentMode : availablePresentModes)
-		//{
-		//	if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
-		//	{
-		//		Logger::Log(LogLevel::INFO, "Present mode : Mailbox");
-		//		return availablePresentMode;
-		//	}
-		//}
+		for (const auto& availablePresentMode : availablePresentModes)
+		{
+			if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+			{
+				Logger::Log(LogLevel::INFO, "Present mode : Mailbox");
+				return availablePresentMode;
+			}
+		}
 
 		// for (const auto &availablePresentMode : availablePresentModes) {
 		//   if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
